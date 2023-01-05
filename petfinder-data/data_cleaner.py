@@ -1,5 +1,6 @@
 import pandas as pd
 from pathlib import Path
+from config import City_State
 
 DATA_FOLDER = Path(__file__).parent / "data"
 
@@ -77,13 +78,12 @@ def find_org(org_id, org_name) -> pd.DataFrame:
 
     return org_dict_df
 
-
 if __name__ == "__main__":
 
     # read in the raw data for animals
-    data_file = DATA_FOLDER / "chicago_animals.pkl"
+    data_file = DATA_FOLDER / f"{City_State.replace(', ', '_').lower()}_animals.pkl"
     # read in the raw data for organizations
-    org_data_file = DATA_FOLDER / "chicago_orgs.pkl"
+    org_data_file = DATA_FOLDER / f"{City_State.replace(', ', '_').lower()}_orgs.pkl"
 
     df_raw = pd.read_pickle(data_file)
     org_df_raw = pd.read_pickle(org_data_file)
@@ -108,5 +108,10 @@ if __name__ == "__main__":
     # concatenate the final columns
     df_final = pd.concat([df_raw[cols_as_is], org, los, breeds, colors, environ, attributes], axis=1)
 
+    # add in a city and state column
+    loc = City_State.split(', ')
+    df_final['city'] = loc[0]
+    df_final['state'] = loc[1]
+
     # save cleaned dataframe to a pickle file
-    df_final.to_pickle(DATA_FOLDER / "chicago_animals_cleaned.pkl")
+    df_final.to_pickle(DATA_FOLDER / f"{City_State.replace(', ', '_').lower()}_animals_cleaned.pkl")
